@@ -37,6 +37,6 @@ class Route(models.Model):
         return f"{self.train.name} {self.name} (Arrival  {self.arrival_time} - Departure {self.departure_time})"   
 
 
-# class Schedule(models.Model):
-#     train = models.ForeignKey(TrainModel, on_delete=models.CASCADE)
-#     date = models.DateField()
+class Schedule(models.Model):
+    train = models.ForeignKey(TrainModel, on_delete=models.CASCADE)
+    date = models.DateField()
