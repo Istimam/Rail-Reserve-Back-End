@@ -29,6 +29,7 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
+CORS_ALLOW_HEADERS = "*"
 CSRF_TRUSTED_ORIGINS = [
     'https://library-management-system-bl2n.onrender.com',
     'http://0.0.0.0',
