@@ -16,12 +16,16 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserUpdateSerializer, ChangePasswordSerializer, UsersSerializer
 User = get_user_model()
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
 
 class UserRegistrationView(APIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserRegistrationSerializer
 
+    @method_decorator(csrf_exempt)
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         
@@ -78,10 +82,20 @@ class UserLoginView(APIView):
     
 
 class UserLogoutView(APIView):
-    def get(self , request):
-        request.user.auth_token.delete()
+    def get(self, request):
+        try:
+            # Check if the user has an associated token
+            token = Token.objects.get(user=request.user)
+            token.delete()
+        except Token.DoesNotExist:
+            # Token does not exist, handle the situation if needed
+            pass
+        
+        # Perform Django's logout
         logout(request)
-        return redirect('login')
+        
+        # Redirect to the login page or any other page
+        return redirect('login')         
 
 class UserListView(LoginRequiredMixin, generics.ListAPIView):
     queryset = User.objects.all()
