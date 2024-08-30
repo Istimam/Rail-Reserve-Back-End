@@ -1,5 +1,5 @@
 # views.py
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,12 +9,14 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
-from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserUpdateSerializer, ChangePasswordSerializer, UsersSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserUpdateSerializer, ChangePasswordSerializer, UsersSerializer, UserProfileSerializer
+
 User = get_user_model()
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -97,13 +99,47 @@ class UserLogoutView(APIView):
         # Redirect to the login page or any other page
         return redirect('login')         
 
-class UserListView(LoginRequiredMixin, generics.ListAPIView):
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(id=self.request.user.id)
+
+    @action(detail=False, methods=['get', 'put', 'patch'], url_path='me')
+    def me(self, request, *args, **kwargs):
+        """
+        This action allows the user to retrieve or update their own profile.
+        """
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user)
+            return Response(serializer.data)
+        
+        if request.method in ['PUT', 'PATCH']:
+            partial = request.method == 'PATCH'
+            serializer = self.get_serializer(request.user, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data)
+
+class UserDeleteView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+
+    def delete(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        
+        # Optional: Add logic to ensure that the requesting user can delete the specified user
+        if user != request.user and not request.user.is_superuser:
+            return Response({'detail': 'Not authorized to delete this user.'}, status=status.HTTP_403_FORBIDDEN)
+
+        user.delete()
+        return Response({'detail': 'User deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def handle_no_permission(self):
-        return redirect('login')
+    
 
 class UserUpdateView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()

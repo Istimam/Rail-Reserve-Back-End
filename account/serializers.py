@@ -98,3 +98,9 @@ class ChangePasswordSerializer(serializers.Serializer):
         if attrs['new_password'] != attrs['new_password2']:
             raise serializers.ValidationError({"new_password": "New password fields didn't match."})
         return attrs
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'phone_no', 'username', 'email', 'postal_code', 'address', 'nid_number', 'date_of_birth', 'is_active', 'is_superuser', 'date_joined']
+        read_only_fields = ['id', 'username', 'nid_number', 'date_of_birth', 'is_active', 'is_superuser', 'date_joined']
