@@ -28,10 +28,11 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['rail-reserve-back-end.onrender.com', 'library-management-system-bl2n.onrender.com', '0.0.0.0', '127.0.0.1']
 CORS_ALLOW_HEADERS = "*"
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
+    'https://rail-reserve-back-end.onrender.com',
     'https://library-management-system-bl2n.onrender.com',
     'http://0.0.0.0',
     'http://127.0.0.1',
