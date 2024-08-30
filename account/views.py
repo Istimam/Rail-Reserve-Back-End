@@ -2,6 +2,7 @@
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
@@ -33,9 +34,12 @@ class UserRegistrationView(APIView):
         
         if serializer.is_valid():
             user = serializer.save()
+            current_site = get_current_site(request)
+            domain = current_site.domain
+
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            confirm_link = f"http://127.0.0.1:8000/active/{uid}/{token}"
+            confirm_link = f"http://{domain}/active/{uid}/{token}"
             email_sub = "Confirm Your Account"
             email_body = render_to_string('account_confirmation.html',{'confirm_link': confirm_link,})
             email = EmailMultiAlternatives(email_sub, '', to=[user.email])
