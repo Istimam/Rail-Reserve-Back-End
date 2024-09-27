@@ -40,6 +40,7 @@ from rest_framework import status
 
 #             return Response(train_serializer.data, status=status.HTTP_201_CREATED)
 #         return Response(train_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class TrainViewSet(viewsets.ModelViewSet):
     queryset = Train.objects.all()
     serializer_class = TrainSerializer

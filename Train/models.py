@@ -2,34 +2,24 @@ from django.db import models
 from django.db.models.functions import Lower
 # Model for the days of the week on which the train runs
 class RunsOn(models.Model):
-    day_name = models.CharField(max_length=20,unique=True)  # Example: "Monday", "Tuesday", etc.
+    day_name = models.CharField(max_length=20)  # Example: "Monday", "Tuesday", etc.
     
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                Lower('day_name'), name='unique_lower_day_name'
-            )
-        ]
+    
     def __str__(self):
         return self.day_name
 
 
 # Model for the different classes of coaches on the train
 class CoachClass(models.Model):
-    coach_name = models.CharField(max_length=50, unique=True)  # Example: "First Class", "Second Class", etc.
+    coach_name = models.CharField(max_length=50)  # Example: "First Class", "Second Class", etc.
    
     def __str__(self):
         return self.coach_name
 
 # Model for the stations
 class Station(models.Model):
-    name = models.CharField(max_length=100, unique=True)  # Station name
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                Lower('name'), name='unique_lower_station_name'
-            )
-        ]
+    name = models.CharField(max_length=100)  # Station name
+    
     def __str__(self):
         return self.name
 

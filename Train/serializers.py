@@ -40,7 +40,7 @@ class TrainSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Train
-        fields = ['name', 'coach_classes', 'runs_on', 'train_stations']
+        fields = ['id', 'name', 'coach_classes', 'runs_on', 'train_stations']
 
     def create(self, validated_data):
         stations_data = validated_data.pop('train_stations')

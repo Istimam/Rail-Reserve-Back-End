@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserUpdateSerializer, ChangePasswordSerializer, UsersSerializer, UserProfileSerializer
+from django.http import HttpResponseRedirect
 
 User = get_user_model()
 from django.views.decorators.csrf import csrf_exempt
@@ -60,9 +61,9 @@ def isActivate(request, uid64, token):
         user.is_active = True
         user.save()
         # return Response({"message": "Account confirmed successfully"}, status=status.HTTP_200_OK)
-        return redirect('login')
+        return HttpResponseRedirect("http://127.0.0.1:5500/Rail_Reserve%20Front-End/login.html")
     else:
-        return redirect('register')
+        return HttpResponseRedirect("http://127.0.0.1:5500/Rail_Reserve%20Front-End/registrationForm.html")
 
 class UserLoginView(APIView):
     permission_classes = (AllowAny,)
